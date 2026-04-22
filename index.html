@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GasTos PH — Fuel Cost Calculator &amp; Live Prices</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<!-- Leaflet Routing Machine -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<!-- App Styles -->
+<link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+
+<!-- ═══ TOPBAR ═══ -->
+<nav class="topbar">
+  <a class="logo" href="#">
+    <div class="logo-mark">⛽</div>
+    <div class="logo-name"><em>GasTos</em> PH</div>
+  </a>
+  <div class="nav">
+    <button class="nav-btn active" onclick="showPage('calc',this)">Calculator</button>
+    <button class="nav-btn" onclick="showPage('prices',this)">Prices</button>
+    <button class="nav-btn" onclick="showPage('mappage',this)">Map</button>
+    <button class="nav-btn" onclick="showPage('community',this)">Community</button>
+  </div>
+  <div class="topbar-meta">
+    <div class="live-pill">Live</div>
+    <div class="updated" id="upd-time">—</div>
+  </div>
+</nav>
+
+<!-- ENERGY CRISIS ALERT -->
+<div class="crisis-banner" id="crisis-banner">
+  <span>⚠️ <strong>Energy Crisis Alert:</strong> PH fuel prices at record highs (Apr 2026) due to Middle East supply disruption. Prices updated weekly. <a href="#" onclick="showPage('prices',document.querySelectorAll('.nav-btn')[1]);document.getElementById('crisis-banner').style.display='none'" style="color:#FF8C42;text-decoration:underline">See latest prices →</a></span>
+  <button class="cb-dismiss" onclick="document.getElementById('crisis-banner').style.display='none'">✕</button>
+</div>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker-wrap"><div class="ticker-track" id="ticker"></div></div>
+
+<!-- ═══════════════════════ CALCULATOR PAGE ═══════════════════════ -->
+<div id="page-calc" class="page active">
+<div class="calc-layout">
+
+  <!-- LEFT -->
+  <div>
+    <div class="card">
+      <div class="card-title"><div class="card-icon">⚡</div>Gas Cost Calculator</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('simple',this)">Simple</button>
+        <button class="tab-btn" onclick="switchTab('advanced',this)">Advanced</button>
+        <button class="tab-btn" onclick="switchTab('compare',this)">Compare</button>
+      </div>
+
+      <!-- ── SIMPLE ── -->
+      <div class="tab-panel active" id="tp-simple">
+
+        <!-- Origin -->
+        <div class="ac-wrap" id="aw-origin">
+          <div class="ac-label">Origin <span class="hint" onclick="detectLocation()">📍 Detect my location</span></div>
+          <input class="ac-input" id="inp-origin" type="text" placeholder="Search anywhere in the Philippines…" autocomplete="off" oninput="onAcInput('origin')" onkeydown="onAcKey(event,'origin')"/>
+          <button class="ac-clear" id="cl-origin" onclick="clearField('origin')">✕</button>
+          <div class="ac-spinner" id="sp-origin"></div>
+          <div class="ac-dropdown" id="dd-origin"></div>
+        </div>
+
+        <!-- Destination -->
+        <div class="ac-wrap" id="aw-dest">
+          <div class="ac-label">Destination</div>
+          <input class="ac-input" id="inp-dest" type="text" placeholder="Search anywhere in the Philippines…" autocomplete="off" oninput="onAcInput('dest')" onkeydown="onAcKey(event,'dest')"/>
+          <button class="ac-clear" id="cl-dest" onclick="clearField('dest')">✕</button>
+          <div class="ac-spinner" id="sp-dest"></div>
+          <div class="ac-dropdown" id="dd-dest"></div>
+        </div>
+
+        <!-- Route type -->
+        <div class="route-type-row">
+          <button class="rt-btn active" id="rt-road" onclick="setRouteType('road',this)">🛣️ Road route</button>
+          <button class="rt-btn" id="rt-straight" onclick="setRouteType('straight',this)">📐 Straight line</button>
+        </div>
+
+        <!-- MAP -->
+        <div class="map-container">
+          <div id="calc-map"></div>
+          <div class="map-overlay-msg" id="map-overlay">
+            <div class="mo-icon">🗺️</div>
+            <div class="mo-text">Search above — or click the map to pin</div>
+            <div class="mo-sub">Click anywhere in the Philippines to set origin or destination</div>
+          </div>
+          <div class="drag-hint" id="drag-hint" style="display:none">✦ Drag markers to fine-tune position</div>
+          <div class="pin-popup" id="pin-popup">
+            <button class="pin-popup-close" onclick="closePinPopup()">✕</button>
+            <div class="pin-popup-title">Pin this location</div>
+            <div class="pin-popup-addr" id="pin-addr">Fetching address…</div>
+            <div class="pin-popup-btns">
+              <button class="pin-popup-btn" onclick="confirmPin('origin')"><span class="pp-dot" style="background:#00C46A"></span>Set as Origin</button>
+              <button class="pin-popup-btn" onclick="confirmPin('dest')"><span class="pp-dot" style="background:#FF5252"></span>Set as Destination</button>
+            </div>
+          </div>
+          <div class="map-route-info" id="route-info">
+            <div>
+              <div class="mri-dist" id="ri-dist">— km</div>
+              <div class="mri-label">Estimated distance <span class="mri-tag" id="ri-tag">road</span></div>
+            </div>
+            <button class="mri-use" onclick="applyRouteDistance()">Use this distance ↓</button>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="fgroup">
+            <div class="flabel">Distance (km) <span class="hint">Or use map above</span></div>
+            <input type="number" id="s-dist" placeholder="e.g. 35" min="0" step="0.1"/>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">Fuel type</div>
+            <select id="s-ftype" onchange="autoFill('s')">
+              <option value="88.10">RON 95 — ₱88.10/L</option>
+              <option value="84.32">RON 91 — ₱84.32/L</option>
+              <option value="96.50">RON 97/100 — ₱96.50/L</option>
+              <option value="101.78">Diesel — ₱101.78/L</option>
+              <option value="149.89">Kerosene — ₱149.89/L</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="fgroup">
+            <div class="flabel">Fuel price (₱/L) <span class="hint">Auto-filled ↑</span></div>
+            <input type="number" id="s-price" step="0.01" placeholder="₱/L"/>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">Fuel efficiency (km/L)</div>
+            <input type="number" id="s-kml" placeholder="e.g. 12" min="1" step="0.1"/>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div class="tr-info"><div class="tr-main">Round trip</div><div class="tr-sub">Doubles the distance automatically</div></div>
+          <label class="sw"><input type="checkbox" id="s-round"><span class="sw-track"></span></label>
+        </div>
+        <button class="calc-btn" onclick="calcSimple()">Calculate fuel cost →</button>
+      </div>
+
+      <!-- ── ADVANCED ── -->
+      <div class="tab-panel" id="tp-advanced">
+        <div class="fgroup">
+          <div class="flabel">Vehicle type</div>
+          <select id="a-vtype" onchange="setPreset()">
+            <option value="35">Motorcycle — ~35 km/L</option>
+            <option value="12" selected>Sedan / City Car — ~12 km/L</option>
+            <option value="9">SUV / AUV — ~9 km/L</option>
+            <option value="7">Truck / Van — ~7 km/L</option>
+            <option value="22">Hybrid — ~22 km/L</option>
+            <option value="4">Jeepney / Bus — ~4 km/L</option>
+            <option value="60">Electric (equiv) — ~60 km/L</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="fgroup">
+            <div class="flabel">Distance (km)</div>
+            <input type="number" id="a-dist" placeholder="km" min="0"/>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">Fuel price (₱/L)</div>
+            <input type="number" id="a-price" value="88.10" step="0.01"/>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="fgroup">
+            <div class="flabel">Custom km/L <span class="hint">Override</span></div>
+            <input type="number" id="a-kml" placeholder="Auto from type" step="0.1"/>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">No. of passengers</div>
+            <input type="number" id="a-pax" value="1" min="1" max="60"/>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div class="tr-info"><div class="tr-main">Split cost equally</div><div class="tr-sub">Divides total among all passengers</div></div>
+          <label class="sw"><input type="checkbox" id="a-split"><span class="sw-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="tr-info"><div class="tr-main">Round trip</div><div class="tr-sub">Doubles the distance</div></div>
+          <label class="sw"><input type="checkbox" id="a-round"><span class="sw-track"></span></label>
+        </div>
+        <button class="calc-btn" onclick="calcAdv()">Calculate →</button>
+      </div>
+
+      <!-- ── COMPARE ── -->
+      <div class="tab-panel" id="tp-compare">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Compare two vehicles on the same route.</p>
+        <div class="field-row">
+          <div class="fgroup"><div class="flabel">Distance (km)</div><input type="number" id="c-dist" placeholder="km"/></div>
+          <div class="fgroup"><div class="flabel">Fuel price (₱/L)</div><input type="number" id="c-price" value="88.10" step="0.01"/></div>
+        </div>
+        <div class="field-row">
+          <div class="fgroup"><div class="flabel">Vehicle A — km/L</div><input type="number" id="c-kml1" placeholder="e.g. 10" step="0.1"/></div>
+          <div class="fgroup"><div class="flabel">Vehicle B — km/L</div><input type="number" id="c-kml2" placeholder="e.g. 18" step="0.1"/></div>
+        </div>
+        <button class="calc-btn" onclick="calcCmp()">Compare →</button>
+        <div id="cmp-out" style="display:none;margin-top:16px">
+          <div class="field-row">
+            <div class="result-box show" style="margin:0"><div class="res-small">Vehicle A</div><div class="res-big" id="c-r1">—</div><div style="font-size:12px;color:var(--text2)" id="c-n1"></div></div>
+            <div class="result-box show" style="margin:0"><div class="res-small">Vehicle B</div><div class="res-big" id="c-r2">—</div><div style="font-size:12px;color:var(--text2)" id="c-n2"></div></div>
+          </div>
+          <div id="c-save" style="margin-top:10px;padding:11px 14px;background:var(--green-glow);border:1px solid var(--border-g);border-radius:9px;font-size:13px;color:var(--green);font-weight:500"></div>
+        </div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-box" id="main-result">
+        <div class="res-small">Estimated total fuel cost</div>
+        <div class="res-big" id="r-total">₱0.00</div>
+        <div class="res-grid">
+          <div class="res-cell"><div class="rv" id="r-liters">—</div><div class="rl">Liters</div></div>
+          <div class="res-cell"><div class="rv" id="r-dist">—</div><div class="rl">Distance</div></div>
+          <div class="res-cell"><div class="rv" id="r-per">—</div><div class="rl">Per person</div></div>
+        </div>
+        <div class="res-foot" id="r-note"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+    <div class="doe">
+      <div class="doe-icon">ℹ️</div>
+      <div class="doe-txt"><strong>Data source:</strong> Prices from <strong>DOE Philippines</strong> weekly price advisory (Apr 22–28, 2026 edition). Map search powered by <strong>OpenStreetMap / Nominatim</strong> — covers barangay, street, and landmark level across all of PH. Road routing via <strong>OSRM</strong>.</div>
+    </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+    <div class="card" style="padding:18px">
+      <div class="card-title" style="margin-bottom:4px"><div class="card-icon">📊</div>Live fuel prices</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">DOE weekly advisory · Apr 22–28, 2026</p>
+      <div class="region-bar">
+        <label>Region</label>
+        <select id="region-sel" onchange="renderPrices()">
+          <option value="ncr">Metro Manila (NCR)</option>
+          <option value="r1">Region I — Ilocos</option>
+          <option value="r2">Region II — Cagayan Valley</option>
+          <option value="r3">Region III — Central Luzon</option>
+          <option value="r4a">Region IV-A — CALABARZON</option>
+          <option value="r4b">Region IV-B — MIMAROPA</option>
+          <option value="r5">Region V — Bicol</option>
+          <option value="r6">Region VI — W. Visayas</option>
+          <option value="r7">Region VII — Cebu</option>
+          <option value="r8">Region VIII — E. Visayas</option>
+          <option value="r9">Region IX — Zamboanga</option>
+          <option value="r10">Region X — N. Mindanao</option>
+          <option value="r11">Region XI — Davao</option>
+          <option value="r12">Region XII — SOCCSKSARGEN</option>
+          <option value="car">CAR — Cordillera</option>
+          <option value="caraga">CARAGA</option>
+          <option value="barmm">BARMM</option>
+        </select>
+      </div>
+      <div id="price-list"></div>
+      <div class="src-badge">🏛️ DOE PH · weekly advisory</div>
+    </div>
+
+    <div class="card" style="padding:18px">
+      <div class="card-title" style="margin-bottom:4px"><div class="card-icon" style="background:rgba(255,176,32,.1);border-color:rgba(255,176,32,.3)">💬</div>Community feedback</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:2px">Rate the app or report a price error.</p>
+      <div class="star-row" id="stars">
+        <span class="star" onclick="rate(1)">★</span><span class="star" onclick="rate(2)">★</span>
+        <span class="star" onclick="rate(3)">★</span><span class="star" onclick="rate(4)">★</span>
+        <span class="star" onclick="rate(5)">★</span>
+      </div>
+      <textarea class="fb-area" id="fb-txt" placeholder="Suggest a feature, report wrong price..."></textarea>
+      <div class="fb-row">
+        <button class="fb-sub" onclick="submitFB()">Submit</button>
+        <button class="fb-ghost" onclick="showPage('community',document.querySelectorAll('.nav-btn')[3])">View reports</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════ PRICES PAGE ═══════════════════════ -->
+<div id="page-prices" class="page">
+<div class="prices-layout">
+  <div class="prices-header">
+    <div><h1>Fuel prices by brand</h1><p>NCR averages · DOE advisory Apr 22–28, 2026</p></div>
+  </div>
+  <div class="price-note">⚠️ <strong>Record-high prices in effect.</strong> Philippine fuel prices have surged significantly since March 2026 due to the Middle East conflict and closure of the Strait of Hormuz. Prices may still be adjusting weekly. Verify at the pump.</div>
+  <div class="brands-grid" id="brands-grid"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════ MAP PAGE ═══════════════════════ -->
+<div id="page-mappage" class="page">
+<div class="map-page-layout">
+  <div style="margin-bottom:14px">
+    <div class="card" style="padding:16px 20px">
+      <div class="card-title" style="margin-bottom:12px"><div class="card-icon">🗺️</div>Station locator — Philippines</div>
+      <div class="map-controls">
+        <div class="fgroup" style="flex:2"><div class="flabel">Search any location in PH</div><input type="text" id="map-search-input" placeholder="e.g. Dasmariñas Cavite, Caloocan, Cagayan de Oro…" onkeydown="if(event.key==='Enter')doMapSearch()"/></div>
+        <div class="fgroup"><div class="flabel">Brand</div>
+        <select id="map-brand-filter" onchange="filterMapBrand()">
+          <option value="">All brands</option>
+          <option>Shell</option><option>Petron</option><option>Caltex</option><option>Seaoil</option><option>Phoenix</option><option>Jetti</option><option>Flying V</option><option>Cleanfuel</option>
+        </select></div>
+        <button class="search-btn" onclick="doMapSearch()">Search →</button>
+      </div>
+    </div>
+  </div>
+  <div id="main-map"></div>
+  <p style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center">Map: © OpenStreetMap contributors · Tiles: CARTO Dark Matter · Click anywhere to explore PH</p>
+</div>
+</div>
+
+<!-- ═══════════════════════ COMMUNITY PAGE ═══════════════════════ -->
+<div id="page-community" class="page">
+<div class="community-layout">
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title"><div class="card-icon">👥</div>Report a pump price</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Saw a different price at the pump? Help keep data accurate.</p>
+    <div class="field-row triple">
+      <div class="fgroup"><div class="flabel">Brand</div>
+        <select><option>Shell</option><option>Petron</option><option>Caltex</option><option>Seaoil</option><option>Phoenix</option><option>Jetti</option><option>Flying V</option><option>Cleanfuel</option><option>Other</option></select></div>
+      <div class="fgroup"><div class="flabel">Fuel type</div>
+        <select><option>RON 95</option><option>RON 91</option><option>RON 97/100</option><option>Diesel</option><option>Diesel Plus</option><option>Kerosene</option></select></div>
+      <div class="fgroup"><div class="flabel">Price (₱/L)</div><input type="number" placeholder="₱/L" step="0.01"/></div>
+    </div>
+    <div class="field-row">
+      <div class="fgroup"><div class="flabel">Location</div><input type="text" placeholder="City, barangay, or landmark"/></div>
+      <div class="fgroup"><div class="flabel">Date</div><input type="text" id="comm-date" readonly/></div>
+    </div>
+    <button class="calc-btn" style="max-width:220px" onclick="showToast('Price report submitted for review! ✓')">Submit report →</button>
+  </div>
+  <div class="card-title" style="margin-bottom:12px"><div class="card-icon">📋</div>Recent community reports</div>
+  <div id="comm-list"></div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<!-- App Scripts — order matters -->
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/map.js"></script>
+<script src="js/autocomplete.js"></script>
+<script src="js/calculator.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

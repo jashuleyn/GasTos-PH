@@ -323,18 +323,78 @@
     <div class="card" style="padding:16px 20px">
       <div class="card-title" style="margin-bottom:12px"><div class="card-icon">🗺️</div>Station locator — Philippines</div>
       <div class="map-controls">
-        <div class="fgroup" style="flex:2"><div class="flabel">Search any location in PH</div><input type="text" id="map-search-input" placeholder="e.g. Dasmariñas Cavite, Caloocan, Cagayan de Oro…" onkeydown="if(event.key==='Enter')doMapSearch()"/></div>
-        <div class="fgroup"><div class="flabel">Brand</div>
-        <select id="map-brand-filter" onchange="filterMapBrand()">
-          <option value="">All brands</option>
-          <option>Shell</option><option>Petron</option><option>Caltex</option><option>Seaoil</option><option>Phoenix</option><option>Jetti</option><option>Flying V</option><option>Cleanfuel</option>
-        </select></div>
+        <div class="fgroup" style="flex:2">
+          <div class="flabel">Search any location in PH</div>
+          <input type="text" id="map-search-input" placeholder="e.g. Dasmariñas Cavite, Caloocan, Cagayan de Oro…" onkeydown="if(event.key==='Enter')doMapSearch()"/>
+        </div>
+        <div class="fgroup">
+          <div class="flabel">Brand</div>
+          <select id="map-brand-filter" onchange="filterMapBrand()">
+            <option value="">All brands</option>
+            <option value="shell">Shell</option>
+            <option value="petron">Petron</option>
+            <option value="caltex">Caltex</option>
+            <option value="seaoil">Seaoil</option>
+            <option value="phoenix">Phoenix</option>
+            <option value="jetti">Jetti</option>
+            <option value="flying v">Flying V</option>
+            <option value="cleanfuel">Cleanfuel</option>
+          </select>
+        </div>
         <button class="search-btn" onclick="doMapSearch()">Search →</button>
+      </div>
+      <div class="map-locator-hint">📍 Search a location → gas stations within 3 km are plotted · Click a pin for prices &amp; details</div>
+    </div>
+  </div>
+
+  <!-- Map + Panel wrapper -->
+  <div class="map-panel-wrap">
+    <div id="main-map"></div>
+
+    <!-- Station Detail Panel (slides in from right) -->
+    <div class="station-panel" id="station-panel">
+      <button class="sp-close" onclick="hideStationPanel()">✕</button>
+
+      <div class="sp-header" id="sp-header">
+        <div class="sp-emoji-wrap">
+          <span class="sp-emoji" id="sp-emoji">⛽</span>
+        </div>
+        <div class="sp-title-group">
+          <div class="sp-name" id="sp-name">Gas Station</div>
+          <div class="sp-meta-row">
+            <span class="sp-brand-badge" id="sp-brand-badge">Brand</span>
+            <span class="sp-dist-tag" id="sp-dist">— away</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp-body">
+        <div class="sp-info-row" id="sp-addr-row">
+          <span class="sp-info-icon">📍</span>
+          <span class="sp-info-text" id="sp-addr">Address not available</span>
+        </div>
+        <div class="sp-info-row">
+          <span class="sp-info-icon">🕐</span>
+          <span class="sp-info-text" id="sp-hours">Hours unknown</span>
+        </div>
+        <div class="sp-info-row" id="sp-phone-row">
+          <span class="sp-info-icon">📞</span>
+          <span class="sp-info-text" id="sp-phone"></span>
+        </div>
+
+        <div class="sp-prices-section">
+          <div class="sp-section-label">⛽ Fuel prices at this station</div>
+          <div class="sp-prices" id="sp-prices"></div>
+        </div>
+
+        <div class="sp-cta-note">Click <strong>Use ↑</strong> on any fuel type to pre-fill the calculator with this station's price.</div>
       </div>
     </div>
   </div>
-  <div id="main-map"></div>
-  <p style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center">Map: © OpenStreetMap contributors · Tiles: CARTO Dark Matter · Click anywhere to explore PH</p>
+
+  <p style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center">
+    Map: © OpenStreetMap contributors · Tiles: CARTO Dark Matter · Stations: OpenStreetMap via Overpass API
+  </p>
 </div>
 </div>
 

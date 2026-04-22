@@ -118,18 +118,32 @@
           </div>
           <div class="fgroup">
             <div class="flabel">Fuel type</div>
-            <select id="s-ftype" onchange="autoFill('s')">
-              <option value="88.10">RON 95 — ₱88.10/L</option>
-              <option value="84.32">RON 91 — ₱84.32/L</option>
-              <option value="96.50">RON 97/100 — ₱96.50/L</option>
-              <option value="101.78">Diesel — ₱101.78/L</option>
-              <option value="149.89">Kerosene — ₱149.89/L</option>
+            <select id="s-ftype" onchange="onFuelOrStationChange()">
+              <option value="RON 95">RON 95</option>
+              <option value="RON 91">RON 91</option>
+              <option value="RON 97/100">RON 97/100</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Kerosene">Kerosene</option>
             </select>
           </div>
         </div>
         <div class="field-row">
           <div class="fgroup">
-            <div class="flabel">Fuel price (₱/L) <span class="hint">Auto-filled ↑</span></div>
+            <div class="flabel">Gas station</div>
+            <select id="s-station" onchange="onFuelOrStationChange()">
+              <option value="">— Pick a station —</option>
+              <option value="Shell">Shell</option>
+              <option value="Petron">Petron</option>
+              <option value="Caltex">Caltex</option>
+              <option value="Seaoil">Seaoil</option>
+              <option value="Phoenix">Phoenix</option>
+              <option value="Flying V">Flying V</option>
+              <option value="Cleanfuel">Cleanfuel</option>
+              <option value="Jetti">Jetti</option>
+            </select>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">Fuel price (₱/L) <span class="hint" id="s-price-hint">Auto-filled ↑</span></div>
             <input type="number" id="s-price" step="0.01" placeholder="₱/L"/>
           </div>
           <div class="fgroup">
@@ -208,6 +222,16 @@
           </div>
           <div id="c-save" style="margin-top:10px;padding:11px 14px;background:var(--green-glow);border:1px solid var(--border-g);border-radius:9px;font-size:13px;color:var(--green);font-weight:500"></div>
         </div>
+      </div>
+
+      <!-- STATION COMPARISON -->
+      <div class="station-cmp-box" id="station-cmp" style="display:none">
+        <div class="scmp-header">
+          <span class="scmp-title">⛽ Station price comparison</span>
+          <span class="scmp-fuel-tag" id="scmp-fuel-tag">RON 95</span>
+        </div>
+        <div class="scmp-note" id="scmp-note"></div>
+        <div class="scmp-list" id="scmp-list"></div>
       </div>
 
       <!-- RESULT -->

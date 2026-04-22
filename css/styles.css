@@ -251,3 +251,130 @@ select option{background:var(--bg3)}
 /* RESPONSIVE */
 @media(max-width:900px){.calc-layout{grid-template-columns:1fr}}
 @media(max-width:600px){.field-row,.field-row.triple{grid-template-columns:1fr}.res-grid{grid-template-columns:1fr 1fr}.topbar{padding:0 14px}.nav-btn{padding:5px 8px;font-size:11px}.crisis-banner{font-size:11px}}
+
+/* ── STATION COMPARISON BLOCK ─────────────────── */
+.station-cmp-box {
+  margin-top: 14px;
+  border: 1px solid var(--border-g);
+  border-radius: 14px;
+  background: rgba(0,196,106,0.04);
+  overflow: hidden;
+}
+
+.scmp-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.scmp-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text1);
+}
+
+.scmp-fuel-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 20px;
+  background: rgba(61,184,255,.12);
+  border: 1px solid rgba(61,184,255,.3);
+  color: #3DB8FF;
+}
+
+.scmp-note {
+  padding: 9px 16px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.scmp-note.warn  { color: #FFB020; background: rgba(255,176,32,.07); }
+.scmp-note.good  { color: var(--green); background: var(--green-glow); }
+.scmp-note.info  { color: var(--text2); }
+
+.scmp-list { padding: 6px 10px 10px; display: flex; flex-direction: column; gap: 6px; }
+
+.scmp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--card2);
+  transition: background .15s;
+}
+.scmp-row.is-selected {
+  border-color: rgba(61,184,255,.4);
+  background: rgba(61,184,255,.06);
+}
+.scmp-row.is-cheapest {
+  border-color: rgba(0,196,106,.4);
+  background: var(--green-glow);
+}
+.scmp-row.is-selected.is-cheapest {
+  border-color: rgba(0,196,106,.5);
+  background: var(--green-glow);
+}
+
+.scmp-rank {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  flex-shrink: 0;
+}
+.is-cheapest .scmp-rank { background: var(--green); color: #000; }
+
+.scmp-info { flex: 1; min-width: 0; }
+.scmp-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text1);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.scmp-meta {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.scmp-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 20px;
+}
+.scmp-badge.cheapest { background: rgba(0,196,106,.15); border: 1px solid rgba(0,196,106,.3); color: var(--green); }
+.scmp-badge.selected { background: rgba(61,184,255,.12); border: 1px solid rgba(61,184,255,.3); color: #3DB8FF; }
+.scmp-badge.type-tag { background: var(--border); border: 1px solid var(--border); color: var(--text3); }
+
+.scmp-diff {
+  color: #FF8C42;
+  font-weight: 600;
+}
+
+.scmp-use-btn {
+  flex-shrink: 0;
+  padding: 5px 11px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 7px;
+  background: var(--green-glow);
+  border: 1px solid var(--border-g);
+  color: var(--green);
+  cursor: pointer;
+  transition: background .15s;
+}
+.scmp-use-btn:hover { background: rgba(0,196,106,.2); }

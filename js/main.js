@@ -13,7 +13,7 @@ function init() {
   renderPrices();
   buildBrands();
   buildComm();
-  autoFill('s');
+  onFuelOrStationChange();
   initCalcMap();
 }
 

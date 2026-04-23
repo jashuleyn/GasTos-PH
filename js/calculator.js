@@ -2,6 +2,51 @@
 // CALCULATOR — Fuel cost calculations
 // ────────────────────────────────────────────────
 
+// Vehicle → allowed fuel types (in display order)
+const VEHICLE_FUEL_MAP = {
+  motorcycle: ['RON 95', 'RON 91'],
+  car:        ['RON 95', 'RON 91', 'RON 97/100'],
+  van:        ['Diesel', 'RON 95', 'RON 91'],
+  truck:      ['Diesel'],
+  jeepney:    ['Diesel'],
+  hybrid:     ['RON 95', 'RON 91'],
+};
+
+// All possible fuel options (value → label)
+const ALL_FUEL_OPTIONS = [
+  { value: 'RON 95',     label: 'RON 95' },
+  { value: 'RON 91',     label: 'RON 91' },
+  { value: 'RON 97/100', label: 'RON 97/100' },
+  { value: 'Diesel',     label: 'Diesel' },
+  { value: 'Kerosene',   label: 'Kerosene' },
+];
+
+let selectedVehicle = 'car';
+
+function selectVehicle(vehicle, btn) {
+  selectedVehicle = vehicle;
+
+  // Update active button
+  document.querySelectorAll('#vehicle-picker .vp-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  // Rebuild fuel type dropdown
+  const sel = document.getElementById('s-ftype');
+  const currentVal = sel.value;
+  const allowed = VEHICLE_FUEL_MAP[vehicle] || ALL_FUEL_OPTIONS.map(o => o.value);
+
+  sel.innerHTML = allowed.map(v => {
+    const opt = ALL_FUEL_OPTIONS.find(o => o.value === v);
+    return `<option value="${opt.value}">${opt.label}</option>`;
+  }).join('');
+
+  // Preserve selection if still valid, else pick first
+  if (allowed.includes(currentVal)) sel.value = currentVal;
+  else sel.selectedIndex = 0;
+
+  onFuelOrStationChange();
+}
+
 // Fuel type key normaliser → matches BRANDS price keys
 const FUEL_KEY_MAP = {
   'RON 95':    ['RON 95'],

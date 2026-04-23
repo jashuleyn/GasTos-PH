@@ -111,6 +111,19 @@
           </div>
         </div>
 
+        <!-- Vehicle type picker -->
+        <div class="fgroup" style="margin-bottom:12px">
+          <div class="flabel">Vehicle type</div>
+          <div class="vehicle-picker" id="vehicle-picker">
+            <button class="vp-btn" data-vehicle="motorcycle" onclick="selectVehicle('motorcycle',this)" title="Motorcycle">🏍️<span>Motor</span></button>
+            <button class="vp-btn active" data-vehicle="car" onclick="selectVehicle('car',this)" title="Car">🚗<span>Car</span></button>
+            <button class="vp-btn" data-vehicle="van" onclick="selectVehicle('van',this)" title="Van / AUV">🚐<span>Van / AUV</span></button>
+            <button class="vp-btn" data-vehicle="truck" onclick="selectVehicle('truck',this)" title="Truck">🚛<span>Truck</span></button>
+            <button class="vp-btn" data-vehicle="jeepney" onclick="selectVehicle('jeepney',this)" title="Jeepney / Bus">🚌<span>Jeepney</span></button>
+            <button class="vp-btn" data-vehicle="hybrid" onclick="selectVehicle('hybrid',this)" title="Hybrid">⚡<span>Hybrid</span></button>
+          </div>
+        </div>
+
         <div class="field-row">
           <div class="fgroup">
             <div class="flabel">Distance (km) <span class="hint">Or use map above</span></div>

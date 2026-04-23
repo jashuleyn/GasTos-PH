@@ -813,3 +813,45 @@ select option{background:var(--bg3)}
     height: 360px;
   }
 }
+
+/* ── VEHICLE PICKER ── */
+.vehicle-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.vp-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--card2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 22px;
+  color: var(--text2);
+  transition: border-color .18s, background .18s, color .18s;
+  min-width: 64px;
+  flex: 1;
+}
+.vp-btn span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  color: var(--text3);
+  transition: color .18s;
+  white-space: nowrap;
+}
+.vp-btn:hover {
+  border-color: var(--green);
+  background: var(--green-glow);
+}
+.vp-btn:hover span { color: var(--green); }
+.vp-btn.active {
+  border-color: var(--green);
+  background: var(--green-glow);
+  color: var(--text1);
+}
+.vp-btn.active span { color: var(--green); }

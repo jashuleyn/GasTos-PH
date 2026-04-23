@@ -581,13 +581,11 @@ function showStationPanel(station, distText) {
       <div class="sp-price-row">
         <span class="sp-fuel-name">${escapeHtml(fuel)}</span>
         <span class="sp-fuel-price">₱${price.toFixed(2)}/L</span>
-        <button class="sp-use-btn" onclick="useStationInCalc(${JSON.stringify(brandMatch.n)}, ${Number(price)}, ${JSON.stringify(fuel)})">Use ↑</button>
       </div>
     `).join('');
   } else {
     priceRows = `
       <div class="sp-no-price">ℹ️ Exact prices not available in our database — check the pump or use NCR average.</div>
-      <button class="sp-use-btn-full" onclick="useStationInCalcDefault(${JSON.stringify(station.name)})">Use NCR average price →</button>
     `;
   }
 

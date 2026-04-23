@@ -24,7 +24,6 @@ function renderPrices() {
       <div><div class="pr-name">${p.t}</div><div class="pr-brand">${p.b}</div></div>
       <div style="display:flex;align-items:center;gap:6px">
         <div class="pr-val"><div class="pr-amount">₱${p.p.toFixed(2)}/L</div><div class="pr-chg ${cc}">${cs}</div></div>
-        <button class="use-btn" onclick="injectPrice(${p.p},'${p.t}')">Use ↑</button>
       </div>
     </div>`;
   }).join('');

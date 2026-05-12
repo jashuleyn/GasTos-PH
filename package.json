@@ -1,0 +1,20 @@
+{
+  "name": "gastos-ph",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GasTos PH static HCI prototype deployment package for Vercel.",
+  "scripts": {
+    "dev": "npx vercel dev",
+    "deploy": "npx vercel --prod",
+    "deploy:preview": "npx vercel",
+    "perf": "node scripts/performance-check.mjs"
+  },
+  "keywords": [
+    "hci",
+    "fuel-calculator",
+    "vercel",
+    "static-site",
+    "philippines"
+  ],
+  "license": "MIT"
+}
